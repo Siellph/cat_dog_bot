@@ -65,7 +65,7 @@ async def command_start_handler(message: Message) -> None:
         types.KeyboardButton(text=f'Котики{CAT}'),
         types.KeyboardButton(text=f'Собачки{DOG}')
     ]
-    keyboard = types.ReplyKeyboardRemove(keyboard=[key], resize_keyboard=True)
+    keyboard = types.ReplyKeyboardMarkup(keyboard=[key], resize_keyboard=True)
     await message.answer(
         f'Привет, {hbold(message.from_user.full_name)}{CAT}{DOG}',
         reply_markup=keyboard)
