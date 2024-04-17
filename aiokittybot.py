@@ -10,17 +10,16 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message, URLInputFile
-from aiogram.utils.markdown import hbold
 
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
 URL_CATS = 'https://api.thecatapi.com/v1/images/search'
 URL_DOGS = 'https://api.thedogapi.com/v1/images/search'
-URL_CAPIBARA = 'https://api.capy.lol/v1/capybara'
+URL_CAPYBARA = 'https://api.capy.lol/v1/capybara'
 CAT = emoji.emojize(':cat_face:')
 DOG = emoji.emojize(':dog_face:')
-PIG = emoji.emojize(':pig_face:')
+CAPYBARA = emoji.emojize(':moai:')
 
 dp = Dispatcher()
 
@@ -50,6 +49,7 @@ async def new_cat(message: Message) -> None:
     image_url = await get_new_image(URL_CATS)
     image = URLInputFile(image_url, filename='cat.png')
     await message.bot.send_photo(message.chat.id, photo=image)
+    await message.delete()
 
 
 @dp.message(F.text.lower() == f'{DOG}')
@@ -59,26 +59,30 @@ async def new_dog(message: Message) -> None:
     image_url = await get_new_image(URL_DOGS)
     image = URLInputFile(image_url, filename='dog.png')
     await message.bot.send_photo(message.chat.id, photo=image)
+    await message.delete()
 
 
-@dp.message(F.text.lower() == f'{PIG}')
+@dp.message(F.text.lower() == f'{CAPYBARA}')
 async def new_capybara(message: Message) -> None:
     if await nikolya(message):
         return
-    image = URLInputFile(URL_CAPIBARA, filename='capibara.png')
+    image = URLInputFile(URL_CAPYBARA, filename='capybara.png')
     await message.bot.send_photo(message.chat.id, photo=image)
+    await message.delete()
 
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
+    await message.delete()
     key = [
         types.KeyboardButton(text=f'{CAT}'),
         types.KeyboardButton(text=f'{DOG}'),
-        types.KeyboardButton(text=f'{PIG}')
+        types.KeyboardButton(text=f'{CAPYBARA}')
     ]
     keyboard = types.ReplyKeyboardMarkup(keyboard=[key], resize_keyboard=True)
-    await message.answer(
-        f'Привет, {hbold(message.from_user.full_name)}{CAT}{DOG}{PIG}',
+    await message.bot.send_message(
+        message.chat.id,
+        text=f'{CAPYBARA}',
         reply_markup=keyboard)
 
 
