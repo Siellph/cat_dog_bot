@@ -17,8 +17,10 @@ load_dotenv()
 TOKEN = os.getenv('TOKEN')
 URL_CATS = 'https://api.thecatapi.com/v1/images/search'
 URL_DOGS = 'https://api.thedogapi.com/v1/images/search'
+URL_CAPIBARA = 'https://api.capy.lol/v1/capybara'
 CAT = emoji.emojize(':cat_face:')
 DOG = emoji.emojize(':dog_face:')
+PIG = emoji.emojize(':pig_face:')
 
 dp = Dispatcher()
 
@@ -37,37 +39,46 @@ async def get_new_image(URL):
 
 async def nikolya(message):
     if message.from_user.id == 1330898313 and random.random() < 0.5:
-        await message.answer('Ну Коль...')
+        await message.answer(f'Ну Коль{emoji.emojize(":red_heart:")}')
         return True
 
 
-@dp.message(F.text.lower() == f'котики{CAT}')
+@dp.message(F.text.lower() == f'{CAT}')
 async def new_cat(message: Message) -> None:
     if await nikolya(message):
         return
     image_url = await get_new_image(URL_CATS)
     image = URLInputFile(image_url, filename='cat.png')
-    await message.answer_photo(image)
+    await message.bot.send_photo(message.chat.id, photo=image)
 
 
-@dp.message(F.text.lower() == f'собачки{DOG}')
+@dp.message(F.text.lower() == f'{DOG}')
 async def new_dog(message: Message) -> None:
     if await nikolya(message):
         return
     image_url = await get_new_image(URL_DOGS)
-    image = URLInputFile(image_url, filename='cat.png')
-    await message.answer_photo(image)
+    image = URLInputFile(image_url, filename='dog.png')
+    await message.bot.send_photo(message.chat.id, photo=image)
+
+
+@dp.message(F.text.lower() == f'{PIG}')
+async def new_capybara(message: Message) -> None:
+    if await nikolya(message):
+        return
+    image = URLInputFile(URL_CAPIBARA, filename='capibara.png')
+    await message.bot.send_photo(message.chat.id, photo=image)
 
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     key = [
-        types.KeyboardButton(text=f'Котики{CAT}'),
-        types.KeyboardButton(text=f'Собачки{DOG}')
+        types.KeyboardButton(text=f'{CAT}'),
+        types.KeyboardButton(text=f'{DOG}'),
+        types.KeyboardButton(text=f'{PIG}')
     ]
     keyboard = types.ReplyKeyboardMarkup(keyboard=[key], resize_keyboard=True)
     await message.answer(
-        f'Привет, {hbold(message.from_user.full_name)}{CAT}{DOG}',
+        f'Привет, {hbold(message.from_user.full_name)}{CAT}{DOG}{PIG}',
         reply_markup=keyboard)
 
 
@@ -77,5 +88,8 @@ async def main() -> None:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    asyncio.run(main())
+    try:
+        logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print('...Bot is stopped...')
